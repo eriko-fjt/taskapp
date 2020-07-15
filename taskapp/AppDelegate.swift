@@ -7,16 +7,37 @@
 //
 
 import UIKit
+import UserNotifications // 7.2で追記
+
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
+// UNUserNotificationCenterDelegateを追加　7.5
+class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
 
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        
+        //7.2で追記
+        //ユーザに通知の許可を求める
+        let center = UNUserNotificationCenter.current()
+        center.requestAuthorization(options: [.alert, .sound]) { (granted, error) in
+            // Enable or desable feature based on authorization
+        }
+
+        center.delegate = self // 7.5で築城
+        
         return true
     }
+    
+    //7.5で追記
+    // アプリがフォアグラウンドの時に通帳を付けとると呼ばれるメソッド
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        completionHandler([.alert, .sound])
+    }
+    
+    
 
     // MARK: UISceneSession Lifecycle
 
