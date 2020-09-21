@@ -9,6 +9,8 @@
 import UIKit
 import UserNotifications // 7.2で追記
 
+import RealmSwift  // 課題で追記
+
 
 @UIApplicationMain
 // UNUserNotificationCenterDelegateを追加　7.5
@@ -18,6 +20,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        
+        //　課題
+        //DBにカテゴリーを増やしたため、追記
+        let config = Realm.Configuration(
+            schemaVersion: 2,
+            migrationBlock: { migration, oldSchemaVersion in
+                if (oldSchemaVersion < 1) {
+                }
+        })
+        
+        Realm.Configuration.defaultConfiguration = config
+        
+        //config = Realm.Configuration()
+        //config.deleteRealmIfMigrationNeeded = true
+        
         
         //7.2で追記
         //ユーザに通知の許可を求める

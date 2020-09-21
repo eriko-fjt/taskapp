@@ -13,17 +13,23 @@ import UserNotifications  // 7.3で追加
 class InputViewController: UIViewController {
     
     
+    
     @IBOutlet weak var titleTextField: UITextField!
+    
     
     @IBOutlet weak var contentsTextView: UITextView!
     
     @IBOutlet weak var datePicker: UIDatePicker!
     
+    @IBOutlet weak var categoryTextField: UITextField!
+    
+    
+    
     
     // 6.10で追記  インスタンスを生成している
     let realm = try! Realm()
     
-    // 6.8で追記
+    // 6.8で追記。モデル
     var task: Task!
     
     
@@ -38,20 +44,25 @@ class InputViewController: UIViewController {
         let tapGesture: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         self.view.addGestureRecognizer(tapGesture)
         
+        //それぞれの欄に、DBの値を代入
         titleTextField.text = task.title
         contentsTextView.text = task.contents
         datePicker.date = task.date
+        
+        // 課題　カテゴリ
+        categoryTextField.text = task.category
     
     }
     
     
     
-    
+    // 画面遷移時に、画面が消える際呼ばれる
     override func viewWillDisappear(_ animated: Bool) {
         try! realm.write {
             self.task.title = self.titleTextField.text!
             self.task.contents = self.contentsTextView.text
             self.task.date = self.datePicker.date
+            self.task.category = self.categoryTextField.text  // 課題　Taskのカテゴリカラムに、欄に記入されたカテゴリを代入
             self.realm.add(self.task, update: .modified)
         }
         

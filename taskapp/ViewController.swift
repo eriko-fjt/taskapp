@@ -11,19 +11,25 @@ import RealmSwift
 import UserNotifications
 
 
-class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate {
     
     
     @IBOutlet weak var tableView: UITableView!
+    
+    
+    @IBOutlet weak var categorySearchBar: UISearchBar!
+    
+    
     
     // Realmインスタンスを取得 6.6で追記
     let realm = try! Realm()
     
     // 6.6で追記
     // DB内のタスクが格納されるリスト
-    // 日付の近い順でソート：照準
+    // 日付の近い順でソート：昇順
     // 以降内容をアップデートするとリスト内は自動的に更新される。
     var taskArray = try! Realm().objects(Task.self).sorted(byKeyPath: "date", ascending: true)
+    
     
     
 
@@ -32,9 +38,16 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         // Do any additional setup after loading the view.
         
         
-        
         tableView.delegate = self
         tableView.dataSource = self
+        
+        // 課題用
+        categorySearchBar.delegate = self
+        categorySearchBar.placeholder = "カテゴリを入力してタスクを絞り込む"
+        categorySearchBar.enablesReturnKeyAutomatically = false
+        categorySearchBar.tintColor = UIColor.systemBlue
+
+        
     }
     
     
@@ -56,17 +69,38 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         // Cellに値を設定する
         let task = taskArray[indexPath.row]
         cell.textLabel?.text = task.title
-        
+            
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd HH:mm"
-        
+            
         let dateString:String = formatter.string(from: task.date)
         cell.detailTextLabel?.text = dateString
         
+            
         return cell
     }
     
-    // 各セルを選択した時に実行されるメソッド
+    
+    // 課題　サーチバーの検索ボタンクリック時に実行される
+    func searchBarSearchButtonClicked(_ categorySearchBar: UISearchBar) {
+        
+        categorySearchBar.endEditing(true)
+        
+        if categorySearchBar.text == "" {
+            taskArray = realm.objects(Task.self).sorted(byKeyPath: "date", ascending: true)
+            
+        } else {
+            taskArray = realm.objects(Task.self).filter("category == %@", categorySearchBar.text!).sorted(byKeyPath: "date", ascending: true)
+            
+        }
+        tableView.reloadData()
+    }
+    
+
+
+    
+    
+    // 各セルを選択した時に実行されるメソッド 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         performSegue(withIdentifier: "cellSegue", sender: nil)
         
